@@ -1,0 +1,30 @@
+package com.aurionpro.util;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class PasswordHasher {
+	public static String hashPassword(String password) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			md.update(password.getBytes());
+			byte[] bytes = md.digest();
+
+			StringBuilder sb = new StringBuilder();
+			for (byte b : bytes) {
+				sb.append(String.format("%02x", b));
+			}
+			return sb.toString();
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static void main(String[] args) {
+		System.out.println("Hashed password for 'admin123': " + hashPassword("admin123"));
+		System.out.println("Hashed password for 'cust123': " + hashPassword("cust123"));
+		System.out.println("Hashed password for 'sam123': " + hashPassword("sam123"));
+	}
+}

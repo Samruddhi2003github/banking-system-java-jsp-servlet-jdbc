@@ -20,7 +20,7 @@
 <body>
     <div class="card shadow">
         <h3 class="mb-3 text-center text-primary">🏦 Samruddhi Bank - Open Account</h3>
-        <form action="CreateAccountServlet" method="post">
+        <form action="createAccountServlet" method="post">
             <input type="hidden" name="userId" value="<%= user.getUserId() %>">
 
             <div class="row">

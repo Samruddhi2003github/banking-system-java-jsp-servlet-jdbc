@@ -3,27 +3,17 @@ package com.aurionpro.controller;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 
 import com.aurionpro.model.User;
 import com.aurionpro.service.UserService;
 
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-    private UserService userService;
+    private static final long serialVersionUID = 1L;
+    private UserService userService = new UserService();
 
-    @Override
-    public void init() throws ServletException {
-        userService = new UserService();  
-    }
-
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
-            throws ServletException, IOException {
-        
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         String role = req.getParameter("role");
@@ -33,17 +23,14 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            session.setAttribute("username", user.getUsername());
-
-            if ("Customer".equalsIgnoreCase(role)) {
+            
+            if ("Customer".equalsIgnoreCase(user.getRole())) {
                 resp.sendRedirect("customerDashboard.jsp");
-            } else if ("Admin".equalsIgnoreCase(role)) {
+            } else if ("Admin".equalsIgnoreCase(user.getRole())) {
                 resp.sendRedirect("adminDashboard.jsp");
-            } else {
-                resp.sendRedirect("login.jsp");
             }
         } else {
-            req.setAttribute("error", "Invalid username or password!");
+            req.setAttribute("error", "Invalid user credentials!");
             req.getRequestDispatcher("login.jsp").forward(req, resp);
         }
     }

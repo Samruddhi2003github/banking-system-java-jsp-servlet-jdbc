@@ -4,9 +4,9 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-
 import com.aurionpro.model.User;
 import com.aurionpro.service.UserService;
+import com.aurionpro.util.PasswordHasher;
 
 @WebServlet("/profile")
 public class ProfileServlet extends HttpServlet {
@@ -14,7 +14,6 @@ public class ProfileServlet extends HttpServlet {
     private UserService userService = new UserService();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Show profile page
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
@@ -24,7 +23,6 @@ public class ProfileServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Update profile
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
@@ -32,24 +30,29 @@ public class ProfileServlet extends HttpServlet {
         }
 
         User currentUser = (User) session.getAttribute("user");
-
-        // get updated values from form
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String mobile = request.getParameter("mobile");
         String address = request.getParameter("address");
         String password = request.getParameter("password");
+        
 
+      
+        if (password != null && !password.trim().isEmpty()) {
+            String hashedPassword = PasswordHasher.hashPassword(password);
+            currentUser.setPassword(hashedPassword);
+        }
+        
+      
         currentUser.setName(name);
         currentUser.setEmail(email);
         currentUser.setMobile(mobile);
         currentUser.setAddress(address);
-        currentUser.setPassword(password);
 
         boolean updated = userService.updateProfile(currentUser);
 
         if (updated) {
-            session.setAttribute("user", currentUser); // update session also
+            session.setAttribute("user", currentUser);
             request.setAttribute("message", "Profile updated successfully!");
         } else {
             request.setAttribute("error", "Failed to update profile. Try again!");
